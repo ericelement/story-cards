@@ -1,0 +1,6 @@
+.DS_Store
+*.log
+
+# Don't commit personal writing — the app's exported backups
+script-backup.json
+*-backup.json
