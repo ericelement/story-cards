@@ -605,33 +605,40 @@ function speakerOf(p,sc){return charById(p,sc.speakerId||'c0');}
 function nextCharColor(p){return CHAR_COLORS[((p.characters||[]).length-1)%CHAR_COLORS.length];}
 
 function seed(){
-  const mk=(title,sub,d,narr,checks,refs)=>({id:uid(),title,narration:narr,duration:d,durationManual:true,locked:false,
+  const mk=(title,d,narr,checks,refs,spk)=>({id:uid(),title,narration:narr,duration:d,durationManual:true,locked:false,
     onScreen:(checks||[]).map(c=>({id:uid(),text:c,done:false,pin:null})),checklistImage:'',
-    references:(refs||[]).map(r=>({id:uid(),title:r[0],url:r[1]})),versions:[],activeVersionId:null,title:title,speakerId:'c0'});
+    references:(refs||[]).map(r=>({id:uid(),title:r[0],url:r[1]})),versions:[],activeVersionId:null,speakerId:spk||'c0'});
   const cast=()=>[{id:'c0',name:'Narrator',color:NARRATOR_COLOR}];
-  const hk={id:uid(),title:'HK in 5 hours',subtitle:'香港での五時間',state:'in-progress',heroImage:'',characters:cast(),
+  // Showcase project — a two-voice mini-documentary (Narrator + Mara, the printer)
+  const proof={id:uid(),title:'Proof',subtitle:'ink · lead · paper',state:'in-progress',heroImage:'',
+    characters:[{id:'c0',name:'Narrator',color:NARRATOR_COLOR},{id:'cMara',name:'Mara',color:'#E5604D'}],
     scenes:[
-      mk('Intro','',24,"A 5-hour stopover in Hong Kong with a tight itinerary. To guide the route, we have a guest tourist — hand-drawn by my friend Kristina. We follow my field notes: move at the right speed; use thresholds to reset attention; make stairs do real work; keep signage tone calm; let materials carry identity. That's today's Hong Kong trip.",
-        ['香港での五時間','HONG KONG IN 5 HOURS','ルートの相棒。彼女が指す、僕たちは進む。','Route companion. She points; we move.'],[['ChrissKa','https://www.instagram.com/chrisska']]),
-      mk('HKMOA','',35,"We start at the Hong Kong Museum of Art. After its overhaul, it reopened with expanded galleries facing the harbour. The identity compresses the name into a logomark with a distinctive O. The monochrome gradient nods to ink traditions. It's a graphic system that matches the building's clarity. Architecture and identity speaking the same language.",
-        ['Chinese ink aesthetics','Logo designed by CODESIGN LTD','Antiquities, Painting, Calligraphy, Modern art','Page from my journal','Hong Kong Museum of Art HKMOA 香港藝術館'],[['CoDesign Ltd.','https://www.codesign.com.hk'],['DFA Awards','https://www.dfaa.dfagroup.hk']]),
-      mk('Loveletters','',45,"Video permissions vary by gallery, and 3D scanning isn't allowed. So here's a fictional poster in my journal as a memory of Love Letters. If you want more on my journaling approach, the link is in the description.",
-        ["A fictional poster for 'Love Letters'"],[['How I Journal as a Designer, In Japan','']]),
-      mk('Pier','',35,"Time to cross the bay. You enter the pier and grasp the void of the harbour. Ferries are double-ended — no turning, just continuous boarding and alighting. Open sides keep cross-ventilation going. Design-wise, the green-and-white livery ties boat and building into one identity. A simple system, repeated.",
-        ['Cross-ventilation','Star Ferry pier 尖沙咀（天星）碼頭','Kowloon','Same colors: Pier >< Boat','Upper deck'],[]),
-      mk('Star Ferry','',50,"Crossing time is ~8–9 minutes; it's the historic Island–Kowloon connector until the 1972 cross-harbour tunnel. It's also a one of a kind experience — skyline, breeze. Helps to get refreshed.",
-        ['Star Ferry','Central 中環（天星）碼頭','Kowloon 尖沙咀（天星）碼頭','8–9 min'],[['Star Ferry Heritage','https://www.starferry.com.hk']]),
-      mk('Market','',30,"From the pier, the Central Walkway hands you directly to Central Market — a 1939 Bauhaus Moderne market building reopened in 2021. Read the horizontal atrium as 'public condenser': stairs, simple lines, and an interior that keeps the building as a pedestrian node.",
-        ['Central Market as a Pedestrian node','1939 → 2021','Bauhaus Revitalised'],[['Central Market','https://www.centralmarket.hk']]),
-      mk('Tai Kwun 2','',20,"Adjacently, BELOW JC Cube, the SPACE is built for events: clean volume, simple acoustics. In a crowd you still stay oriented — bilingual stencilled way-finding is painted directly on structure. Calm arrows, no noise.",
-        ['SPACE venue','Bilingual wayfinding','Stencilled signage'],[]),
-      mk('Tai Kwun 4','',25,"Here the identity system is explicit: Tai Kwun wordmark and painted signage tie heritage interpretation, maps, and doors to one voice. Designed by Marc & Chantal, the system stays neutral — black on stone, clear hierarchy, consistent arrows — so the site speaks first.",
-        ['Tai Kwun wordmark','Painted signage system','Black on stone','Arrow system'],[['Marc & Chantal Portfolio','https://www.marc-chantal.com'],['Tai Kwun wayfinding','https://www.taikwun.hk']]),
-      mk('Closing','',28,"Hong Kong doesn't ask you to read it — it routes you. From harbour to hill, every handoff is designed. It is a second episode about this city, and it means we've done with Hong Kong for now, but never for ever. Next episodes, same lens — different cities.",[],[]),
+      mk('Cold open',12,"There's a sound a press makes just before the impression — a held breath, then a kiss of steel on paper. In a back room off a side street, that sound hasn't changed in a hundred years.",
+        ['PROOF — a short film','Est. 1911','sound up: the press'],[],'c0'),
+      mk('The shop',24,"Floor to ceiling, the walls are drawers — a hundred thousand pieces of lead, sorted by size and face. The air is equal parts machine oil and paper dust. Nothing in here is fast. That turns out to be the point.",
+        ['California job case','foundry type · 6–72 pt','smell: ink + oil'],[['M&H Type','https://arionpress.com/mandh/']],'c0'),
+      mk('Why by hand',18,"People think it's nostalgia. It isn't. Setting type by hand slows you to the speed of the decision — every space, every break, chosen once and then held.",
+        ['“the speed of the decision”'],[],'cMara'),
+      mk('Composing',26,"She reads the world backwards. Letters drop into the stick mirror-image, right to left, upside down — and somewhere in the muscle of it she stops translating and simply reads. Then the whole block is bound with a length of string and lifted, impossibly, as one.",
+        ['composing stick','mirror-image · R → L','lock the forme'],[['Printing Types — D.B. Updike','']],'c0'),
+      mk('Makeready',20,"This is the fussy part. Tissue-thin paper, slipped behind the sheet until every letter strikes with the same weight. You can lose a whole afternoon to one comma that prints too light.",
+        ['makeready','packing the platen','even impression'],[],'cMara'),
+      mk('The impression',16,"Then — the pull. The platen closes, the type bites the cotton sheet, and the page comes away with a tooth you can feel in the dark. A proof. The first true copy of the thing.",
+        ['the bite / impression depth','deckle edge','first proof'],[],'c0'),
+      mk('What lasts',18,"Screens forget. This doesn't. A letterpressed page will outlive the machine that printed it, and most likely the hands that set it. There's a strange comfort in that.",
+        ['“screens forget — this doesn’t”'],[['Hamilton Wood Type Museum','https://woodtype.org']],'cMara'),
+      mk('Close',14,"Ink, lead, paper, and the time it takes. The full run — start to first proof — is linked below.",
+        ['PROOF','full run → in description','subscribe'],[],'c0'),
     ]};
-  const tokyo={id:uid(),title:'Tokyo signage',subtitle:'東京の案内',state:'backlog',heroImage:'',characters:cast(),scenes:[newScene('Open'),newScene('Stations')]};
-  const lisbon={id:uid(),title:'Lisbon tiles',subtitle:'里斯本',state:'done',heroImage:'',characters:cast(),scenes:[newScene('Intro'),newScene('Azulejo'),newScene('Close')]};
-  return{theme:'light',accent:'#16B8A8',mode:'edit',activeProjectId:hk.id,recordIndex:0,wpm:140,projects:[hk,tokyo,lisbon]};
+  // Lighter projects, to show the Backlog / Done columns in the drawer
+  const salt={id:uid(),title:'Salt',subtitle:'a slow documentary',state:'backlog',heroImage:'',characters:cast(),
+    scenes:[ mk('Open',11,"Before refrigeration, this was how you kept the sea. On a few flat hectares of mud, a handful of families still do it entirely by hand.",['working title: SALT'],[],'c0'),
+             newScene('The pans'), newScene('Harvest'), newScene('Close') ]};
+  const tide={id:uid(),title:'The Tide Mill',subtitle:'finished cut',state:'done',heroImage:'',characters:cast(),
+    scenes:[ mk('Intro',12,"Twice a day the river runs backwards, and a mill that has stood since the 1100s wakes up to grind. No fuel, no grid — just the moon, doing the work.",['est. 12th c.','powered by tide'],[],'c0'),
+             mk('Mechanism',16,"Incoming water fills a pond behind a one-way gate. At the turn of the tide the gate shuts, the water has nowhere to go but through the wheel, and the stones begin to turn.",['one-way sluice','the holding pond','the wheel'],[],'c0'),
+             newScene('Close') ]};
+  return{theme:'light',accent:'#16B8A8',mode:'edit',activeProjectId:proof.id,recordIndex:0,wpm:140,projects:[proof,salt,tide]};
 }
 
 /* ════════════════════════ Render ════════════════════════ */
