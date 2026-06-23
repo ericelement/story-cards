@@ -155,7 +155,29 @@ body.is-dragging .gap:hover{flex-basis:7px;width:7px;background:transparent}
 .card.locked .lock svg,.tools .lock.on svg{color:var(--accent)}
 .tools .lock.on{color:var(--accent)}
 .tools .ai.busy{color:var(--accent);animation:pulse .8s infinite}
+.tools .mic:hover{color:var(--accent)}
+.tools .mic.busy{color:#e5604d;animation:pulse .8s infinite}
 @keyframes pulse{50%{opacity:.35}}
+.card.dictating{box-shadow:inset 3px 0 0 #e5604d}
+
+/* speaker / character */
+.spk-stripe{position:absolute;left:0;top:0;bottom:0;width:4px;z-index:1}
+.spk-chip{display:inline-flex;align-items:center;gap:7px;margin-top:12px;padding:4px 11px 4px 9px;border:1px solid var(--line);border-radius:20px;font-size:12px;font-weight:500;color:var(--fg-2);background:var(--card);cursor:pointer;transition:border-color .15s,color .15s}
+.spk-chip:hover{border-color:var(--accent);color:var(--fg)}
+.spk-dot{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
+.spk-pop{position:fixed;z-index:90;min-width:214px;background:var(--bg);border:1px solid var(--line);border-radius:12px;box-shadow:0 16px 44px var(--shadow);padding:7px}
+.spk-h{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);padding:6px 9px 9px}
+.spk-opt{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:8px;cursor:pointer;font-size:13.5px;color:var(--fg-2)}
+.spk-opt:hover{background:var(--field)}
+.spk-opt.on{color:var(--accent)}
+.spk-nm{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.spk-sw{width:20px;height:20px;border:1px solid var(--line);border-radius:5px;padding:0;background:none;cursor:pointer;flex:0 0 auto}
+.spk-edit,.spk-del{opacity:.5;cursor:pointer;font-size:12px;line-height:1;color:var(--muted);display:grid;place-items:center}
+.spk-edit:hover{opacity:1;color:var(--accent)}
+.spk-del:hover{opacity:1;color:#e5604d}
+.spk-del svg{width:12px;height:12px}
+.spk-add{width:100%;text-align:left;padding:9px;margin-top:2px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+.spk-add:hover{color:var(--accent)}
 
 /* numerals + stepper */
 .meta{display:flex;align-items:baseline;gap:12px;margin-top:14px;height:18px}
@@ -220,7 +242,7 @@ body.is-dragging .gap:hover{flex-basis:7px;width:7px;background:transparent}
 /* collapsed card */
 .card.collapsed{flex:0 0 var(--spine-w);width:var(--spine-w);padding:30px 0 30px;align-items:center;cursor:pointer;overflow:hidden}
 .card.collapsed>*{display:none}
-.card.collapsed .num,.card.collapsed .spine-title{display:block}
+.card.collapsed .num,.card.collapsed .spine-title,.card.collapsed .spk-stripe{display:block}
 .card.collapsed .num{font-size:30px}
 .card.collapsed .spine-title{writing-mode:vertical-rl;margin-top:22px;font-weight:700;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-height:60vh}
 
@@ -357,6 +379,7 @@ body.drawer-open #drawer{transform:none}
 #record .rtop{display:flex;align-items:center;gap:18px;padding:22px 30px}
 #record .rtop .rnum{font-weight:800;font-size:30px;color:var(--accent)}
 #record .rtop .rtitle{font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:16px}
+#record .rtop .rspk{font-size:12.5px;font-weight:500;letter-spacing:.02em}
 #record .rtop .rspacer{flex:1}
 #record .rexit{color:var(--muted);font-size:12px;letter-spacing:.04em;border:1px solid var(--line);border-radius:7px;padding:7px 12px}
 #record .rexit:hover{color:var(--fg);border-color:var(--fg-2)}
@@ -499,8 +522,34 @@ const I = {
   x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
   gear:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>',
   doc:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h8"/></svg>',
+  mic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>',
 };
 const HERO_SVG = '<svg viewBox="0 0 400 600" fill="none" stroke="currentColor" stroke-width="1.1"><circle cx="200" cy="180" r="120"/><path d="M120 180c0-44 36-80 80-80s80 36 80 80M150 160c20-20 80-20 100 0M170 210c10 14 50 14 60 0"/><circle cx="172" cy="170" r="7"/><circle cx="228" cy="170" r="7"/><path d="M200 200v34M120 300c40 40 120 40 160 0M90 360h220M110 420h180M140 480h120M170 540h60"/></svg>';
+
+/* ── Speech-to-text (dictate into a scene's narration) ── */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+const SPEECH_OK = !!SR;
+let recog=null, dictId=null;
+function toggleDictation(c,sc,btn){
+  if(sc.locked)return;
+  if(!SPEECH_OK){toast('Dictation needs Chrome, Edge or Safari');return;}
+  if(dictId===sc.id){ try{recog&&recog.stop();}catch(e){} return; }   // click again = stop
+  try{recog&&recog.stop();}catch(e){}
+  recog=new SR(); recog.lang='en-US'; recog.continuous=true; recog.interimResults=true;
+  const nEl=c.querySelector('[data-role="narration"]'); let base=sc.narration||'';
+  dictId=sc.id; btn.classList.add('busy'); c.classList.add('dictating');
+  recog.onresult=(e)=>{
+    let fin='',interim='';
+    for(let i=e.resultIndex;i<e.results.length;i++){const r=e.results[i]; (r.isFinal?fin+=r[0].transcript:interim+=r[0].transcript);}
+    if(fin){ base=(base?base.replace(/\s*$/,'')+' ':'')+fin.trim(); sc.narration=base; }
+    nEl.innerText = base + (interim?(' '+interim):'');
+    const wcEl=c.querySelector('[data-role="wc"]'); if(wcEl)wcEl.textContent=wordCount(sc.narration);
+    if(!sc.durationManual){recomputeScene(sc);updateStepper(c,sc);refreshTotal();}
+  };
+  recog.onerror=(e)=>{ if(e.error!=='aborted'&&e.error!=='no-speech')toast('Dictation: '+(e.error||'error')); };
+  recog.onend=()=>{ nEl.innerText=sc.narration||''; save(); btn.classList.remove('busy'); c.classList.remove('dictating'); dictId=null; recog=null; };
+  try{recog.start();toast('Listening… click the mic to stop');}catch(e){dictId=null;btn.classList.remove('busy');c.classList.remove('dictating');}
+}
 
 /* ════════════════════════ Utils ════════════════════════ */
 const $=(s,r=document)=>r.querySelector(s);
@@ -516,6 +565,8 @@ const estDuration=words=> Math.max(2, Math.round(words/WPM*60));
 function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),1900);}
 
 /* ════════════════════════ State ════════════════════════ */
+const NARRATOR_COLOR='#8A847A';
+const CHAR_COLORS=['#E5604D','#3E8BE0','#8B7FE8','#27B36B','#E573A8','#EBC453','#5BC0BE','#F08A3C'];
 const STORE='script-app-v1';
 let state=load()||seed();
 let recordTimer=null, recordPlaying=false, recordRemain=0;
@@ -537,13 +588,28 @@ let saveT=null;
 function save(){clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem(STORE,JSON.stringify(state));}catch(e){}},250);}
 function load(){try{const r=localStorage.getItem(STORE);if(!r)return null;const s=JSON.parse(r);if(!s.projects)return null;return s;}catch(e){return null;}}
 
-function newScene(title=''){return{id:uid(),title,narration:'',duration:8,durationManual:false,locked:false,onScreen:[],checklistImage:'',references:[],versions:[],activeVersionId:null};}
+function newScene(title=''){return{id:uid(),title,narration:'',duration:8,durationManual:false,locked:false,onScreen:[],checklistImage:'',references:[],versions:[],activeVersionId:null,speakerId:'c0'};}
+
+/* ── Characters / speakers ──
+   Each project has a cast. Character 0 ("Narrator") always exists. Scenes carry
+   a speakerId; the speaker's colour shows as a stripe on the card.
+   (NARRATOR_COLOR / CHAR_COLORS are declared earlier, above `state`, because
+   seed() reads them during state initialisation.) */
+function ensureCast(p){
+  if(!Array.isArray(p.characters)||!p.characters.length) p.characters=[{id:'c0',name:'Narrator',color:NARRATOR_COLOR}];
+  if(!p.characters.some(c=>c.id==='c0')) p.characters.unshift({id:'c0',name:'Narrator',color:NARRATOR_COLOR});
+  p.scenes.forEach(s=>{ if(!s.speakerId||!p.characters.some(c=>c.id===s.speakerId)) s.speakerId='c0'; });
+}
+function charById(p,id){return (p.characters||[]).find(c=>c.id===id)||p.characters[0];}
+function speakerOf(p,sc){return charById(p,sc.speakerId||'c0');}
+function nextCharColor(p){return CHAR_COLORS[((p.characters||[]).length-1)%CHAR_COLORS.length];}
 
 function seed(){
   const mk=(title,sub,d,narr,checks,refs)=>({id:uid(),title,narration:narr,duration:d,durationManual:true,locked:false,
     onScreen:(checks||[]).map(c=>({id:uid(),text:c,done:false,pin:null})),checklistImage:'',
-    references:(refs||[]).map(r=>({id:uid(),title:r[0],url:r[1]})),versions:[],activeVersionId:null,title:title});
-  const hk={id:uid(),title:'HK in 5 hours',subtitle:'香港での五時間',state:'in-progress',heroImage:'',
+    references:(refs||[]).map(r=>({id:uid(),title:r[0],url:r[1]})),versions:[],activeVersionId:null,title:title,speakerId:'c0'});
+  const cast=()=>[{id:'c0',name:'Narrator',color:NARRATOR_COLOR}];
+  const hk={id:uid(),title:'HK in 5 hours',subtitle:'香港での五時間',state:'in-progress',heroImage:'',characters:cast(),
     scenes:[
       mk('Intro','',24,"A 5-hour stopover in Hong Kong with a tight itinerary. To guide the route, we have a guest tourist — hand-drawn by my friend Kristina. We follow my field notes: move at the right speed; use thresholds to reset attention; make stairs do real work; keep signage tone calm; let materials carry identity. That's today's Hong Kong trip.",
         ['香港での五時間','HONG KONG IN 5 HOURS','ルートの相棒。彼女が指す、僕たちは進む。','Route companion. She points; we move.'],[['ChrissKa','https://www.instagram.com/chrisska']]),
@@ -563,8 +629,8 @@ function seed(){
         ['Tai Kwun wordmark','Painted signage system','Black on stone','Arrow system'],[['Marc & Chantal Portfolio','https://www.marc-chantal.com'],['Tai Kwun wayfinding','https://www.taikwun.hk']]),
       mk('Closing','',28,"Hong Kong doesn't ask you to read it — it routes you. From harbour to hill, every handoff is designed. It is a second episode about this city, and it means we've done with Hong Kong for now, but never for ever. Next episodes, same lens — different cities.",[],[]),
     ]};
-  const tokyo={id:uid(),title:'Tokyo signage',subtitle:'東京の案内',state:'backlog',heroImage:'',scenes:[newScene('Open'),newScene('Stations')]};
-  const lisbon={id:uid(),title:'Lisbon tiles',subtitle:'里斯本',state:'done',heroImage:'',scenes:[newScene('Intro'),newScene('Azulejo'),newScene('Close')]};
+  const tokyo={id:uid(),title:'Tokyo signage',subtitle:'東京の案内',state:'backlog',heroImage:'',characters:cast(),scenes:[newScene('Open'),newScene('Stations')]};
+  const lisbon={id:uid(),title:'Lisbon tiles',subtitle:'里斯本',state:'done',heroImage:'',characters:cast(),scenes:[newScene('Intro'),newScene('Azulejo'),newScene('Close')]};
   return{theme:'light',accent:'#16B8A8',mode:'edit',activeProjectId:hk.id,recordIndex:0,wpm:140,projects:[hk,tokyo,lisbon]};
 }
 
@@ -580,6 +646,7 @@ function render(){
   WPM=state.wpm||140;
   document.documentElement.setAttribute('data-theme',state.theme);
   setAccentVars(state.accent||'#16B8A8');
+  state.projects.forEach(ensureCast);          // upgrade older saved data
   const p=activeProject();
   // hero (per-project cover, or the default line-art)
   heroEl.innerHTML = p.heroImage ? `<img src="${escapeHTML(p.heroImage)}" alt="">` : HERO_SVG;
@@ -615,7 +682,9 @@ function card(sc,index){
   c.dataset.id=sc.id;c.dataset.index=index;
   const num=index+1;
   const cjk=hasCJK(sc.title)?' cjk':'';
+  const p=activeProject(); const spk=speakerOf(p,sc);
   c.innerHTML=`
+    <div class="spk-stripe" style="background:${spk.color}"></div>
     <div class="toprow">
       <div class="num" data-act="collapse">${num}</div>
       <div class="tools">
@@ -623,6 +692,7 @@ function card(sc,index){
         <button class="ai" data-act="ai" title="AI draft (keeps current)">${I.bolt}</button>
         <button class="lock${sc.locked?' on':''}" data-act="lock" title="${sc.locked?'Unlock':'Lock'}">${sc.locked?I.lock:I.unlock}</button>
         <button class="rectoggle" data-act="record" title="Record from here">${I.rec}</button>
+        ${SPEECH_OK?`<button class="mic" data-act="mic" title="Dictate narration (speech → text)">${I.mic}</button>`:''}
         <button class="del" data-act="del" title="Delete scene">${I.trash}</button>
       </div>
     </div>
@@ -632,6 +702,7 @@ function card(sc,index){
       <span class="stepper" data-act="step" title="Drag up/down or double-click">${sc.duration}<span class="unit">s</span></span>
       <span class="wc"><span data-role="wc">${wordCount(sc.narration)}</span> words ${sc.durationManual?'':'<span class="auto">· auto</span>'}</span>
     </div>
+    <button class="spk-chip" data-act="speaker" title="Set speaker / character"><span class="spk-dot" style="background:${spk.color}"></span><span data-role="spkname">${escapeHTML(spk.name)}</span></button>
     <div class="title${cjk}" contenteditable="${sc.locked?'false':'true'}" data-role="title" spellcheck="false">${escapeHTML(sc.title)}</div>
     <div class="narration" contenteditable="${sc.locked?'false':'true'}" data-role="narration" spellcheck="false">${escapeHTML(sc.narration)}</div>
 
@@ -678,6 +749,50 @@ function renderRefs(c,sc){
   if(!sc.locked) wrap.appendChild(add);
 }
 
+/* ════════════════════════ Speaker / character picker ════════════════════════ */
+let spkPop=null;
+function closeSpeakerPicker(){if(spkPop){spkPop.remove();spkPop=null;document.removeEventListener('pointerdown',spkOutside,true);}}
+function spkOutside(e){if(spkPop&&!spkPop.contains(e.target)&&!e.target.closest('.spk-chip'))closeSpeakerPicker();}
+function openSpeakerPicker(card,sc,anchor){
+  closeSpeakerPicker();
+  const p=activeProject();
+  const pop=document.createElement('div');pop.className='spk-pop';spkPop=pop;
+  const paint=()=>{
+    pop.innerHTML=`<div class="spk-h">Speaker</div>`+
+      p.characters.map(ch=>`<div class="spk-opt${ch.id===sc.speakerId?' on':''}" data-pick="${ch.id}">
+          <input type="color" class="spk-sw" value="${ch.color}" data-color="${ch.id}" title="Colour">
+          <span class="spk-nm">${escapeHTML(ch.name)}</span>
+          <span class="spk-edit" data-ren="${ch.id}" title="Rename">✎</span>
+          ${ch.id==='c0'?'':`<span class="spk-del" data-delc="${ch.id}" title="Remove">${I.x}</span>`}
+        </div>`).join('')+
+      `<button class="spk-add" data-addc>＋ New character</button>`;
+    pop.querySelectorAll('[data-pick]').forEach(el=>el.addEventListener('click',e=>{
+      if(e.target.closest('.spk-sw')||e.target.closest('.spk-edit')||e.target.closest('.spk-del'))return;
+      sc.speakerId=el.dataset.pick;save();closeSpeakerPicker();render();
+    }));
+    pop.querySelectorAll('[data-color]').forEach(inp=>inp.addEventListener('change',()=>{
+      const ch=charById(p,inp.dataset.color);ch.color=inp.value;save();render();
+    }));
+    pop.querySelectorAll('[data-ren]').forEach(el=>el.addEventListener('click',e=>{e.stopPropagation();
+      const ch=charById(p,el.dataset.ren);const n=prompt('Character name:',ch.name);if(n&&n.trim()){ch.name=n.trim();save();paint();render();}
+    }));
+    pop.querySelectorAll('[data-delc]').forEach(el=>el.addEventListener('click',e=>{e.stopPropagation();
+      const id=el.dataset.delc;p.characters=p.characters.filter(c=>c.id!==id);
+      p.scenes.forEach(s=>{if(s.speakerId===id)s.speakerId='c0';});save();paint();render();
+    }));
+    pop.querySelector('[data-addc]').onclick=()=>{
+      const n=prompt('New character name:');if(!n||!n.trim())return;
+      const ch={id:uid(),name:n.trim(),color:nextCharColor(p)};p.characters.push(ch);sc.speakerId=ch.id;save();closeSpeakerPicker();render();
+    };
+  };
+  paint();
+  document.body.appendChild(pop);
+  const r=anchor.getBoundingClientRect();
+  pop.style.left=Math.min(r.left,innerWidth-pop.offsetWidth-12)+'px';
+  pop.style.top=(r.bottom+6)+'px';
+  setTimeout(()=>document.addEventListener('pointerdown',spkOutside,true),0);
+}
+
 /* ════════════════════════ Card interactions ════════════════════════ */
 function bindCard(c,sc){
   c.addEventListener('click',e=>{
@@ -687,6 +802,8 @@ function bindCard(c,sc){
     else if(act==='del'){deleteScene(sc.id);}
     else if(act==='ai'){aiDraft(c,sc,btn);}
     else if(act==='record'){enterRecord(sc.id);}
+    else if(act==='mic'){toggleDictation(c,sc,btn);}
+    else if(act==='speaker'){openSpeakerPicker(c,sc,btn);}
     else if(act==='versions'){if(sc.versions.length)openCompare(sc);}
     else if(act==='addchk'){sc.onScreen.push({id:uid(),text:'',done:false,pin:null});renderChecks(c,sc);const last=c.querySelector('.chk:last-child [data-role="chktext"]');if(last)last.focus();save();}
     else if(act==='viewimg'){openViewer(sc);}
@@ -1200,6 +1317,7 @@ function exportDocument(){
   body+=`<p class="meta">${p.scenes.length} scene${p.scenes.length!==1?'s':''} · ${fmt(totalDuration(p))} total</p><hr>`;
   p.scenes.forEach((s,i)=>{
     body+=`<h2>${i+1}.&nbsp; ${esc(s.title||'Untitled')} <span class="dur">— ${s.duration}s</span></h2>`;
+    body+=`<p class="speaker">${esc(speakerOf(p,s).name.toUpperCase())}</p>`;
     if(s.narration)body+=`<p class="narr">${esc(s.narration)}</p>`;
     if(s.onScreen.length)body+=`<p class="lbl">On-screen</p><ul>${s.onScreen.map(o=>`<li>${esc(o.text)}</li>`).join('')}</ul>`;
     if(s.references.length)body+=`<p class="lbl">References</p><ul>${s.references.map(r=>`<li>${esc(r.title)}${r.url?` — ${esc(r.url)}`:''}</li>`).join('')}</ul>`;
@@ -1208,7 +1326,7 @@ function exportDocument(){
   const doc=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><title>${esc(p.title)}</title>`
     +`<style>body{font-family:Georgia,'Times New Roman',serif;line-height:1.55;color:#1a1a1a;max-width:680px;margin:48px auto;padding:0 28px}`
     +`h1{font-size:27px;margin:0 0 4px}h2{font-size:17px;margin:26px 0 6px}.sub{color:#666;font-style:italic;margin:0 0 6px}.meta{color:#999;font-size:12px;margin:0}`
-    +`.dur{color:#999;font-weight:normal;font-size:14px}.narr{margin:6px 0}.lbl{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#999;margin:12px 0 2px}`
+    +`.dur{color:#999;font-weight:normal;font-size:14px}.narr{margin:6px 0}.speaker{font-size:11px;letter-spacing:.14em;font-weight:bold;color:#444;margin:8px 0 2px}.lbl{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#999;margin:12px 0 2px}`
     +`ul{margin:2px 0 8px 20px;padding:0}li{margin:2px 0}hr{border:none;border-top:1px solid #e0e0e0;margin:20px 0}</style></head><body>${body}</body></html>`;
   const blob=new Blob(['﻿'+doc],{type:'application/msword'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);
@@ -1237,7 +1355,7 @@ function paintRecord(){
   const r=$('#record');const p=activeProject();const i=state.recordIndex;const sc=p.scenes[i];
   if(!sc){exitRecord();return;}
   r.innerHTML=`
-    <div class="rtop"><span class="rnum">${String(i+1).padStart(2,'0')}</span><span class="rtitle">${escapeHTML(sc.title||'Scene')}</span><span class="rspacer"></span><button class="rexit" data-exit>Exit ✕</button></div>
+    <div class="rtop"><span class="rnum">${String(i+1).padStart(2,'0')}</span><span class="rtitle">${escapeHTML(sc.title||'Scene')}</span><span class="rspk" style="color:${speakerOf(p,sc).color}">● ${escapeHTML(speakerOf(p,sc).name)}</span><span class="rspacer"></span><button class="rexit" data-exit>Exit ✕</button></div>
     <div class="rstage"><div class="rnarr">${escapeHTML(sc.narration)||'<span style="color:var(--muted)">— no narration —</span>'}</div></div>
     <div class="rprogress"><div class="rbar" id="rbar"></div></div>
     <div class="rfilm">${p.scenes.map((s,k)=>`<div class="rcell ${k===i?'active':k<i?'past':''}" data-cell="${k}">${k+1}</div>`).join('')}</div>
