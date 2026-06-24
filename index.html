@@ -113,6 +113,8 @@ body.has-hero #heroRemove{display:grid}
 .gap{flex:0 0 3px;width:3px;position:relative;align-self:stretch;z-index:5;cursor:pointer;
   transition:flex-basis .3s var(--ease-weight),width .3s var(--ease-weight),background .2s}
 .gap:hover{flex-basis:74px;width:74px;background:var(--accent)}
+/* the leading gap (before scene 1) collapses flush to the spine — no white sliver */
+.gap:first-child{flex-basis:0;width:0;min-width:0;pointer-events:none}
 .gap .plus{
   position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(.4);
   width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.16);color:var(--on-accent);
